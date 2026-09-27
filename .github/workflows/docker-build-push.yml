@@ -1,0 +1,245 @@
+name: Build, Push, and Deploy Docker Images
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ROLE_TO_ASSUME: ${{ vars.AWS_ROLE_TO_ASSUME }}
+  ECR_FRONTEND_REPOSITORY: expense-tracker-frontend
+  ECR_BACKEND_REPOSITORY: expense-tracker-backend
+  RDS_INSTANCE_IDENTIFIER: expense-tracker-db
+  RDS_SECRET_ARN: ${{ vars.RDS_SECRET_ARN || '' }}
+
+jobs:
+  build-push-deploy:
+    name: Build, Push to ECR, and Deploy via SSM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_FRONTEND_REPOSITORY }}:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_FRONTEND_REPOSITORY }}:latest
+
+      - name: Build and push Backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_BACKEND_REPOSITORY }}:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_BACKEND_REPOSITORY }}:latest
+
+      - name: Deploy Backend Containers via AWS SSM
+        run: |
+          echo "Resolving RDS endpoint dynamically..."
+          RDS_ENDPOINT=$(aws rds describe-db-instances \
+            --region ${{ env.AWS_REGION }} \
+            --db-instance-identifier ${{ env.RDS_INSTANCE_IDENTIFIER }} \
+            --query 'DBInstances[0].Endpoint.Address' \
+            --output text)
+
+          if [ -z "$RDS_ENDPOINT" ] || [ "$RDS_ENDPOINT" = "None" ]; then
+            echo "::error::Failed to resolve RDS endpoint for identifier ${{ env.RDS_INSTANCE_IDENTIFIER }}"
+            exit 1
+          fi
+          echo "RDS Endpoint successfully resolved: $RDS_ENDPOINT"
+
+          echo "Resolving RDS secret ARN dynamically..."
+          RDS_SECRET_ARN=$(aws rds describe-db-instances \
+            --region ${{ env.AWS_REGION }} \
+            --db-instance-identifier ${{ env.RDS_INSTANCE_IDENTIFIER }} \
+            --query 'DBInstances[0].MasterUserSecret.SecretArn' \
+            --output text)
+
+          if [ -z "$RDS_SECRET_ARN" ] || [ "$RDS_SECRET_ARN" = "None" ]; then
+            RDS_SECRET_ARN="${{ env.RDS_SECRET_ARN }}"
+          fi
+
+          if [ -z "$RDS_SECRET_ARN" ] || [ "$RDS_SECRET_ARN" = "None" ]; then
+            echo "::error::Failed to resolve RDS secret ARN for identifier ${{ env.RDS_INSTANCE_IDENTIFIER }}"
+            exit 1
+          fi
+          echo "RDS Secret ARN successfully resolved"
+
+          echo "Preparing backend deployment command payload..."
+          BACKEND_IMAGE="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_BACKEND_REPOSITORY }}:${{ github.sha }}"
+          COMMANDS_JSON=$(jq -n \
+            --arg region "${{ env.AWS_REGION }}" \
+            --arg registry "${{ steps.login-ecr.outputs.registry }}" \
+            --arg image "$BACKEND_IMAGE" \
+            --arg rds "$RDS_ENDPOINT" \
+            --arg secret_arn "$RDS_SECRET_ARN" \
+            '{commands: [
+              "aws ecr get-login-password --region \($region) | docker login --username AWS --password-stdin \($registry)",
+              "docker pull \($image)",
+              "docker stop expense-backend || true",
+              "docker rm expense-backend || true",
+              "docker run -d --name expense-backend --restart unless-stopped -p 8000:8000 -e AWS_REGION=\"\($region)\" -e DB_HOST=\"\($rds)\" -e DB_PORT=\"5432\" -e DB_NAME=\"expense_db\" -e DB_USER=\"expense_user\" -e DB_SECRET_ARN=\"\($secret_arn)\" \($image)",
+              "sleep 5",
+              "curl -fail http://localhost:8000/api/health"
+            ]}')
+
+          echo "Dispatching deployment command to backend instances via tag Role=backend..."
+          COMMAND_ID=$(aws ssm send-command \
+            --region ${{ env.AWS_REGION }} \
+            --targets "Key=tag:Role,Values=backend" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy expense-backend:${{ github.sha }}" \
+            --parameters "$COMMANDS_JSON" \
+            --query "Command.CommandId" \
+            --output text)
+
+          echo "Backend deployment triggered (CommandId: $COMMAND_ID). Resolving targeted instances..."
+          TARGET_INSTANCES=""
+          for i in {1..10}; do
+            TARGET_INSTANCES=$(aws ssm list-command-invocations \
+              --region ${{ env.AWS_REGION }} \
+              --command-id "$COMMAND_ID" \
+              --query 'CommandInvocations[].InstanceId' \
+              --output text)
+            if [ -n "$TARGET_INSTANCES" ]; then
+              break
+            fi
+            sleep 2
+          done
+
+          if [ -z "$TARGET_INSTANCES" ]; then
+            echo "::error::No instances found matching tag Role=backend"
+            exit 1
+          fi
+          echo "Targeted instances: $TARGET_INSTANCES"
+
+          DEPLOY_FAILED=0
+          for instance_id in $TARGET_INSTANCES; do
+            echo "Waiting for completion on $instance_id..."
+            if ! aws ssm wait command-executed \
+              --region ${{ env.AWS_REGION }} \
+              --command-id "$COMMAND_ID" \
+              --instance-id "$instance_id"; then
+              echo "::error::SSM command execution failed or timed out on backend instance: $instance_id"
+              DEPLOY_FAILED=1
+            fi
+
+            echo "=== Invocation Output for $instance_id ==="
+            aws ssm get-command-invocation \
+              --region ${{ env.AWS_REGION }} \
+              --command-id "$COMMAND_ID" \
+              --instance-id "$instance_id" \
+              --query '{InstanceId:InstanceId, Status:Status, Output:StandardOutputContent, Error:StandardErrorContent}' \
+              --output json || true
+          done
+
+          if [ $DEPLOY_FAILED -ne 0 ]; then
+            echo "::error::Backend deployment failed on one or more instances."
+            exit 1
+          fi
+          echo "Backend deployment successfully verified on all instances."
+
+      - name: Deploy Frontend Containers via AWS SSM
+        run: |
+          echo "Preparing frontend deployment command payload..."
+          FRONTEND_IMAGE="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_FRONTEND_REPOSITORY }}:${{ github.sha }}"
+          COMMANDS_JSON=$(jq -n \
+            --arg region "${{ env.AWS_REGION }}" \
+            --arg registry "${{ steps.login-ecr.outputs.registry }}" \
+            --arg image "$FRONTEND_IMAGE" \
+            '{commands: [
+              "aws ecr get-login-password --region \($region) | docker login --username AWS --password-stdin \($registry)",
+              "docker pull \($image)",
+              "docker stop expense-frontend || true",
+              "docker rm expense-frontend || true",
+              "TOKEN=$(curl -s -f -m 3 -X PUT \"http://169.254.169.254/latest/api/token\" -H \"X-aws-ec2-metadata-token-ttl-seconds: 60\" || true)",
+              "INSTANCE_ID=$(curl -s -f -m 3 -H \"X-aws-ec2-metadata-token: $TOKEN\" http://169.254.169.254/latest/meta-data/instance-id || true)",
+              "PUBLIC_IP=$(curl -s -f -m 3 -H \"X-aws-ec2-metadata-token: $TOKEN\" http://169.254.169.254/latest/meta-data/public-ipv4 || true)",
+              "docker run -d --name expense-frontend --restart unless-stopped -p 80:80 -e EC2_INSTANCE_ID=\"$INSTANCE_ID\" -e EC2_PUBLIC_IP=\"$PUBLIC_IP\" \($image)",
+              "sleep 2",
+              "curl -fail -I http://localhost:80/",
+              "curl -fail http://localhost:80/instance-info.json"
+            ]}')
+
+          echo "Dispatching deployment command to frontend instances via tag Role=frontend..."
+          COMMAND_ID=$(aws ssm send-command \
+            --region ${{ env.AWS_REGION }} \
+            --targets "Key=tag:Role,Values=frontend" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy expense-frontend:${{ github.sha }}" \
+            --parameters "$COMMANDS_JSON" \
+            --query "Command.CommandId" \
+            --output text)
+
+          echo "Frontend deployment triggered (CommandId: $COMMAND_ID). Resolving targeted instances..."
+          TARGET_INSTANCES=""
+          for i in {1..10}; do
+            TARGET_INSTANCES=$(aws ssm list-command-invocations \
+              --region ${{ env.AWS_REGION }} \
+              --command-id "$COMMAND_ID" \
+              --query 'CommandInvocations[].InstanceId' \
+              --output text)
+            if [ -n "$TARGET_INSTANCES" ]; then
+              break
+            fi
+            sleep 2
+          done
+
+          if [ -z "$TARGET_INSTANCES" ]; then
+            echo "::error::No instances found matching tag Role=frontend"
+            exit 1
+          fi
+          echo "Targeted instances: $TARGET_INSTANCES"
+
+          DEPLOY_FAILED=0
+          for instance_id in $TARGET_INSTANCES; do
+            echo "Waiting for completion on $instance_id..."
+            if ! aws ssm wait command-executed \
+              --region ${{ env.AWS_REGION }} \
+              --command-id "$COMMAND_ID" \
+              --instance-id "$instance_id"; then
+              echo "::error::SSM command execution failed or timed out on frontend instance: $instance_id"
+              DEPLOY_FAILED=1
+            fi
+
+            echo "=== Invocation Output for $instance_id ==="
+            aws ssm get-command-invocation \
+              --region ${{ env.AWS_REGION }} \
+              --command-id "$COMMAND_ID" \
+              --instance-id "$instance_id" \
+              --query '{InstanceId:InstanceId, Status:Status, Output:StandardOutputContent, Error:StandardErrorContent}' \
+              --output json || true
+          done
+
+          if [ $DEPLOY_FAILED -ne 0 ]; then
+            echo "::error::Frontend deployment failed on one or more instances."
+            exit 1
+          fi
+          echo "Frontend deployment successfully verified on all instances."

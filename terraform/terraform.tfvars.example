@@ -1,0 +1,31 @@
+# ==============================================================================
+# Terraform Variables Template - Cloud Expense Tracker
+# ==============================================================================
+# Copy this file to terraform.tfvars and fill in values for your AWS environment:
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# IMPORTANT: terraform.tfvars contains your account-specific configuration.
+# It is excluded via .gitignore and must NEVER be committed to Git.
+# ==============================================================================
+
+# AWS Region where infrastructure will be provisioned
+region = "ap-south-1"
+
+# Unique suffix appended to globally unique resources (S3 buckets, Cognito pools)
+# Replace with your own unique lowercase alphanumeric string (e.g. "myteam2026")
+project_suffix = "example2026"
+
+# PostgreSQL database master username
+# Password is automatically generated and securely managed by AWS Secrets Manager
+db_username = "expense_user"
+
+# GitHub repository in 'owner/repo' format for GitHub Actions OIDC trust
+# Used to scope sts:AssumeRoleWithWebIdentity so only your repository can deploy
+github_repository = "your-github-username/cloud-expense-tracker-aws"
+
+# ACM Certificate ARN for HTTPS listener on the Application Load Balancer
+# Must be provisioned in the same AWS region (e.g. ap-south-1) for your custom domain
+certificate_arn = "arn:aws:acm:ap-south-1:123456789012:certificate/00000000-0000-0000-0000-000000000000"
+
+# Optional: Email address to subscribe to CloudWatch operational alarm notifications via SNS
+# alert_email = "operations@example.com"

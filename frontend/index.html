@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.amazonaws.com; font-src 'self' data:; img-src 'self' data:;">
+  <title>Cloud Expense Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div>
+        <p class="eyebrow">AWS CLOUD PROJECT</p>
+        <h1>Expense Tracker</h1>
+        <p class="subtitle">Track expenses now. Generate cloud reports later.</p>
+      </div>
+      <div id="health" class="status">Checking API...</div>
+    </header>
+
+    <section class="card infra-card">
+      <div class="section-heading">
+        <div class="infra-title-wrap">
+          <span class="badge-live">Live AWS</span>
+          <h2>AWS Infrastructure</h2>
+        </div>
+        <button id="infra-refresh" class="small secondary-btn" type="button">Refresh</button>
+      </div>
+
+      <div class="infra-grid">
+        <div class="infra-item">
+          <span class="infra-label">Frontend Instance Serving This Request</span>
+          <div id="frontend-instance-info" class="serving-instance-wrap">
+            <div class="instance-row">
+              <span class="instance-label">Public IP:</span>
+              <code id="serving-ip" class="ip-pill">Loading...</code>
+            </div>
+          </div>
+          <p class="infra-note">Identified directly from EC2 metadata by the frontend container serving this request.</p>
+        </div>
+
+        <div class="infra-item infra-meta">
+          <span class="infra-label">Last Checked</span>
+          <span id="infra-last-checked" class="infra-time">—</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Add Expense</h2>
+        <form id="expense-form">
+          <label>
+            Amount (₹)
+            <input id="amount" type="number" min="0.01" step="0.01" required>
+          </label>
+
+          <label>
+            Category
+            <select id="category" required>
+              <option value="">Select category</option>
+              <option>Food</option>
+              <option>Travel</option>
+              <option>Shopping</option>
+              <option>Education</option>
+              <option>Bills</option>
+              <option>Other</option>
+            </select>
+          </label>
+
+          <label>
+            Description
+            <input id="description" type="text" maxlength="200" placeholder="e.g. Dinner">
+          </label>
+
+          <label>
+            Date
+            <input id="expense-date" type="date" required>
+          </label>
+
+          <button type="submit">Add Expense</button>
+          <p id="message" class="message"></p>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="section-heading">
+          <h2>Summary</h2>
+          <span id="expense-count">0 expenses</span>
+        </div>
+
+        <div class="summary">
+          <div>
+            <span>Total</span>
+            <strong id="total">₹0.00</strong>
+          </div>
+          <div>
+            <span>This Month</span>
+            <strong id="month-total">₹0.00</strong>
+          </div>
+        </div>
+
+        <button id="report-button" class="secondary" type="button">
+          Generate Expense Report (AWS Lambda)
+        </button>
+        <div id="report-status" class="report-box" style="display: none;"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-heading">
+        <h2>Recent Expenses</h2>
+        <button id="refresh" class="small">Refresh</button>
+      </div>
+
+      <div id="empty" class="empty">No expenses yet.</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="expense-list"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

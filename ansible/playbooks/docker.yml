@@ -1,0 +1,40 @@
+---
+- name: Install Docker
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install Docker
+      ansible.builtin.dnf:
+        name: docker
+        state: present
+
+    - name: Enable Docker
+      ansible.builtin.systemd:
+        name: docker
+        enabled: true
+
+    - name: Start Docker
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+
+    - name: Verify Docker is running
+      ansible.builtin.command:
+        cmd: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Show Docker version
+      ansible.builtin.debug:
+        var: docker_version.stdout
+
+    - name: Verify Docker service
+      ansible.builtin.systemd:
+        name: docker
+      register: docker_service
+      changed_when: false
+
+    - name: Show Docker service state
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} Docker state: {{ docker_service.status.ActiveState }}"    

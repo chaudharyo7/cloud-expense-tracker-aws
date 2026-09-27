@@ -1,0 +1,9 @@
+Flask==3.1.2
+Flask-Cors==6.0.1
+psycopg[binary]==3.2.10
+python-dotenv==1.1.1
+gunicorn==23.0.0
+boto3==1.43.103
+PyJWT==2.15.0
+cryptography==50.0.1
+Flask-Limiter==4.1.1

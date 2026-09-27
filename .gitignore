@@ -1,0 +1,180 @@
+# ==============================================================================
+# Git Ignore Configuration - Cloud Expense Tracker
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Terraform
+# ------------------------------------------------------------------------------
+# Local .terraform working directory (plugins, modules)
+**/.terraform/
+.terraform/
+
+# Terraform lock file exception: keep .terraform.lock.hcl if you want deterministic provider versions
+# !.terraform.lock.hcl
+
+# Terraform state files (contain live infrastructure attributes and sensitive values)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+*.tfstate.lock.info
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Terraform variable definition files (contain passwords, API keys, credentials)
+*.tfvars
+*.tfvars.json
+
+# Allow variable template examples
+!*.tfvars.example
+!*.tfvars.sample
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration and plan output files
+.terraformrc
+terraform.rc
+*.plan
+*tfplan*
+tfplan
+
+# Generated Lambda deployment archives
+terraform/*.zip
+*.zip
+*.tar.gz
+*.tgz
+
+# ------------------------------------------------------------------------------
+# Environment Variables & Secrets
+# ------------------------------------------------------------------------------
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Allow example environment configuration files
+!.env.example
+!.env.sample
+!.env.template
+
+# Private keys, certificates, credentials
+*.pem
+*.key
+*.pub
+*.cert
+*.crt
+*.pfx
+*.p12
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# ------------------------------------------------------------------------------
+# Python
+# ------------------------------------------------------------------------------
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+.venv*/
+venv*/
+env*/
+
+# Testing & Linting caches
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# ------------------------------------------------------------------------------
+# Ansible
+# ------------------------------------------------------------------------------
+*.retry
+.ansible/
+ansible-artifact*.json
+.vault_pass*
+*.vault
+
+# ------------------------------------------------------------------------------
+# Docker & Containers
+# ------------------------------------------------------------------------------
+*.docker.log
+.docker/
+
+# ------------------------------------------------------------------------------
+# Operating System (macOS & Linux)
+# ------------------------------------------------------------------------------
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux temporary files
+*~
+.directory
+.fuse_hidden*
+.nfs*
+
+# ------------------------------------------------------------------------------
+# IDEs and Code Editors
+# ------------------------------------------------------------------------------
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains (PyCharm, IntelliJ, WebStorm)
+.idea/
+
+# Vim / Emacs swap and backup files
+*.swp
+*.swo
+*~
+\#*\#
+.#*
