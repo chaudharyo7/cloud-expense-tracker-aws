@@ -1,0 +1,131 @@
+# ==============================================================================
+# Terraform State Resource Addresses
+# Project: Cloud Expense Tracker AWS
+# Collection Date: 2026-10-17
+# Status: No local terraform.tfstate found (0 resources tracked in state)
+# ==============================================================================
+#
+# STATE STATUS:
+# Command 'terraform state list' executed on 2026-10-17 returned:
+# "No state file was found! State management commands require a state file."
+#
+# DECLARED CONFIGURATION RESOURCES (115 resources declared across terraform/*.tf):
+# These resources exist declared in configuration and match active live AWS infrastructure,
+# but are currently UNTRACKED in local state due to missing terraform.tfstate:
+#
+aws_apigatewayv2_api.expense_api
+aws_apigatewayv2_authorizer.cognito_jwt
+aws_apigatewayv2_integration.lambda_integration
+aws_apigatewayv2_route.generate_report
+aws_apigatewayv2_stage.expense_api_stage
+aws_cloudwatch_dashboard.expense_dashboard
+aws_cloudwatch_log_group.api_gw_access_logs
+aws_cloudwatch_log_group.lambda_log_group
+aws_cloudwatch_log_metric_filter.lambda_errors_filter
+aws_cloudwatch_log_resource_policy.api_gw_cw_logs_policy
+aws_cloudwatch_metric_alarm.alb_backend_unhealthy_hosts
+aws_cloudwatch_metric_alarm.alb_target_5xx_errors
+aws_cloudwatch_metric_alarm.alb_target_response_time_high
+aws_cloudwatch_metric_alarm.ec2_backend_1_cpu_high
+aws_cloudwatch_metric_alarm.ec2_backend_1_status
+aws_cloudwatch_metric_alarm.ec2_backend_2_status
+aws_cloudwatch_metric_alarm.ec2_frontend_1_status
+aws_cloudwatch_metric_alarm.ec2_frontend_2_status
+aws_cloudwatch_metric_alarm.lambda_errors
+aws_cloudwatch_metric_alarm.lambda_high_duration
+aws_cloudwatch_metric_alarm.lambda_throttles
+aws_cloudwatch_metric_alarm.nat_gw_packets_drop
+aws_cloudwatch_metric_alarm.nat_gw_port_allocation_error
+aws_cloudwatch_metric_alarm.rds_cpu_high
+aws_cloudwatch_metric_alarm.rds_high_connections
+aws_cloudwatch_metric_alarm.rds_low_freeable_memory
+aws_cloudwatch_metric_alarm.rds_low_storage
+aws_cognito_user_pool.expense_user_pool
+aws_cognito_user_pool_client.expense_client
+aws_db_instance.expense_db_instance
+aws_db_subnet_group.expense_db_subnet_group
+aws_ecr_repository.backend
+aws_ecr_repository.frontend
+aws_eip.nat
+aws_iam_instance_profile.ec2_ssm_profile
+aws_iam_openid_connect_provider.github_actions
+aws_iam_policy.ansible_ec2_inventory_policy
+aws_iam_policy.ansible_ssm_controller_policy
+aws_iam_policy.ansible_ssm_s3_policy
+aws_iam_policy.ec2_db_credential_read_policy
+aws_iam_policy.ec2_describe_instances_policy
+aws_iam_policy.ec2_lambda_invoke_policy
+aws_iam_policy.github_actions_ecr_policy
+aws_iam_policy.github_actions_ssm_policy
+aws_iam_policy.lambda_s3_policy
+aws_iam_role.ec2_ssm_role
+aws_iam_role.expense_lambda_role
+aws_iam_role.github_actions_ecr_role
+aws_iam_role_policy_attachment.ec2_db_credential_read_attachment
+aws_iam_role_policy_attachment.ec2_describe_instances_attachment
+aws_iam_role_policy_attachment.ec2_ecr_read_only
+aws_iam_role_policy_attachment.ec2_lambda_invoke_attachment
+aws_iam_role_policy_attachment.ec2_ssm_policy
+aws_iam_role_policy_attachment.expense_lambda_policy_attachment
+aws_iam_role_policy_attachment.expense_lambda_s3_policy_attachment
+aws_iam_role_policy_attachment.expense_lambda_ssm_policy_attachment
+aws_iam_role_policy_attachment.expense_lambda_vpc_policy_attachment
+aws_iam_role_policy_attachment.github_actions_ecr_attachment
+aws_iam_role_policy_attachment.github_actions_ssm_attachment
+aws_iam_user_policy_attachment.ansible_ec2_inventory_attachment
+aws_iam_user_policy_attachment.ansible_ssm_controller_attachment
+aws_iam_user_policy_attachment.ansible_ssm_s3_attachment
+aws_instance.backend_1
+aws_instance.backend_2
+aws_instance.frontend_1
+aws_instance.frontend_2
+aws_internet_gateway.main
+aws_lambda_function.expense_lambda
+aws_lambda_permission.allow_api_gateway
+aws_lb.expense_alb
+aws_lb_listener.expense_listener_frontend
+aws_lb_listener.expense_listener_https
+aws_lb_listener_rule.expense_backend_rule_https
+aws_lb_target_group.expense_target_group_backend
+aws_lb_target_group.expense_target_group_frontend
+aws_lb_target_group_attachment.expense_target_group_attachment_backend
+aws_lb_target_group_attachment.expense_target_group_attachment_backend_2
+aws_lb_target_group_attachment.expense_target_group_attachment_frontend
+aws_lb_target_group_attachment.expense_target_group_attachment_frontend_2
+aws_nat_gateway.main
+aws_route.nat_app
+aws_route_table.private_app
+aws_route_table.private_db
+aws_route_table.public
+aws_route_table_association.private_app_1
+aws_route_table_association.private_app_2
+aws_route_table_association.private_db_1
+aws_route_table_association.private_db_2
+aws_route_table_association.public_1
+aws_route_table_association.public_2
+aws_s3_bucket.ansible_ssm_bucket
+aws_s3_bucket.expense_bucket
+aws_s3_bucket.expense_logs_bucket
+aws_s3_bucket_logging.expense_bucket_logging
+aws_s3_bucket_policy.expense_bucket_policy
+aws_s3_bucket_policy.expense_logs_bucket_policy
+aws_s3_bucket_public_access_block.ansible_ssm_bucket_access
+aws_s3_bucket_public_access_block.expense_bucket_access
+aws_s3_bucket_public_access_block.expense_logs_bucket_access
+aws_s3_bucket_server_side_encryption_configuration.expense_bucket_encryption
+aws_s3_bucket_versioning.expense_bucket_versioning
+aws_security_group.alb_sg
+aws_security_group.app_sg
+aws_security_group.db_sg
+aws_security_group.lambda_sg
+aws_security_group.public_sg
+aws_sns_topic.alerts
+aws_sns_topic_subscription.email_alerts
+aws_subnet.private_app_1
+aws_subnet.private_app_2
+aws_subnet.private_db_1
+aws_subnet.private_db_2
+aws_subnet.public_1
+aws_subnet.public_2
+aws_vpc.main
+aws_vpc_endpoint.s3

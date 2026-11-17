@@ -1,0 +1,377 @@
+{
+  "metadata": {
+    "collection_timestamp_utc": "2026-10-17T01:35:00Z",
+    "aws_region": "ap-south-1",
+    "account_id": "205639******",
+    "iam_identity_arn": "arn:aws:iam::205639******:user/Terraform-User",
+    "project": "cloud-expense-tracker-aws",
+    "data_classification": "Sanitized Evidence (Secrets & PII Redacted)"
+  },
+  "compute": {
+    "ec2_instances": [
+      {
+        "instance_id": "i-0b0294fc87c9ac832",
+        "name": "expense-tracker-frontend-1",
+        "role": "frontend",
+        "state": "running",
+        "instance_type": "t3.micro",
+        "availability_zone": "ap-south-1a",
+        "subnet_id": "subnet-00c7e3570173ad9ac",
+        "private_ip": "10.0.1.x",
+        "public_ip": "[REDACTED_PUBLIC_IP]",
+        "ebs_volume_id": "vol-0fa935f3d760752d9",
+        "security_groups": ["sg-0da1e182fb34451f4"],
+        "iam_instance_profile": "expense-ec2-ssm-profile"
+      },
+      {
+        "instance_id": "i-0d180a9a22ab66f1a",
+        "name": "expense-tracker-frontend-2",
+        "role": "frontend",
+        "state": "running",
+        "instance_type": "t3.micro",
+        "availability_zone": "ap-south-1b",
+        "subnet_id": "subnet-0841b2134835eeb46",
+        "private_ip": "10.0.2.x",
+        "public_ip": "[REDACTED_PUBLIC_IP]",
+        "ebs_volume_id": "vol-02a98a774e69f72ca",
+        "security_groups": ["sg-0da1e182fb34451f4"],
+        "iam_instance_profile": "expense-ec2-ssm-profile"
+      },
+      {
+        "instance_id": "i-0a973fbbf1c0e01e3",
+        "name": "expense-tracker-backend-1",
+        "role": "backend",
+        "state": "running",
+        "instance_type": "t3.micro",
+        "availability_zone": "ap-south-1a",
+        "subnet_id": "subnet-0590bcf4e7f83b99e",
+        "private_ip": "10.0.11.x",
+        "public_ip": null,
+        "ebs_volume_id": "vol-09c60a37584778b0d",
+        "security_groups": ["sg-06b195c60984cc4bb"],
+        "iam_instance_profile": "expense-ec2-ssm-profile"
+      },
+      {
+        "instance_id": "i-048b2374625ee144e",
+        "name": "expense-tracker-backend-2",
+        "role": "backend",
+        "state": "running",
+        "instance_type": "t3.micro",
+        "availability_zone": "ap-south-1b",
+        "subnet_id": "subnet-00056e4d7fa32703b",
+        "private_ip": "10.0.12.x",
+        "public_ip": null,
+        "ebs_volume_id": "vol-0dd9c0a4661577e6a",
+        "security_groups": ["sg-06b195c60984cc4bb"],
+        "iam_instance_profile": "expense-ec2-ssm-profile"
+      }
+    ],
+    "ebs_volumes": [
+      {
+        "volume_id": "vol-0fa935f3d760752d9",
+        "size_gb": 8,
+        "type": "gp3",
+        "state": "in-use",
+        "attached_to": "i-0b0294fc87c9ac832",
+        "delete_on_termination": true
+      },
+      {
+        "volume_id": "vol-02a98a774e69f72ca",
+        "size_gb": 8,
+        "type": "gp3",
+        "state": "in-use",
+        "attached_to": "i-0d180a9a22ab66f1a",
+        "delete_on_termination": true
+      },
+      {
+        "volume_id": "vol-09c60a37584778b0d",
+        "size_gb": 8,
+        "type": "gp3",
+        "state": "in-use",
+        "attached_to": "i-0a973fbbf1c0e01e3",
+        "delete_on_termination": true
+      },
+      {
+        "volume_id": "vol-0dd9c0a4661577e6a",
+        "size_gb": 8,
+        "type": "gp3",
+        "state": "in-use",
+        "attached_to": "i-048b2374625ee144e",
+        "delete_on_termination": true
+      }
+    ],
+    "lambda_functions": [
+      {
+        "function_name": "expense-tracker-lambda",
+        "runtime": "python3.12",
+        "memory_size": 256,
+        "timeout": 30,
+        "role_arn": "arn:aws:iam::205639******:role/expense_lambda_role",
+        "last_modified": "2026-09-27T03:21:54.000+0000"
+      }
+    ]
+  },
+  "networking": {
+    "vpcs": [
+      {
+        "vpc_id": "vpc-0c0e6084ab7a5ea70",
+        "cidr_block": "10.0.0.0/16",
+        "name": "expense-tracker-vpc",
+        "is_default": false
+      }
+    ],
+    "subnets": [
+      {
+        "subnet_id": "subnet-00c7e3570173ad9ac",
+        "name": "expense-tracker-public-subnet-1",
+        "cidr_block": "10.0.1.0/24",
+        "availability_zone": "ap-south-1a",
+        "type": "public"
+      },
+      {
+        "subnet_id": "subnet-0841b2134835eeb46",
+        "name": "expense-tracker-public-subnet-2",
+        "cidr_block": "10.0.2.0/24",
+        "availability_zone": "ap-south-1b",
+        "type": "public"
+      },
+      {
+        "subnet_id": "subnet-0590bcf4e7f83b99e",
+        "name": "expense-tracker-private-subnet-1",
+        "cidr_block": "10.0.11.0/24",
+        "availability_zone": "ap-south-1a",
+        "type": "private_app"
+      },
+      {
+        "subnet_id": "subnet-00056e4d7fa32703b",
+        "name": "expense-tracker-private-subnet-2",
+        "cidr_block": "10.0.12.0/24",
+        "availability_zone": "ap-south-1b",
+        "type": "private_app"
+      },
+      {
+        "subnet_id": "subnet-098dc863142d53b31",
+        "name": "expense-tracker-private-db-subnet-1",
+        "cidr_block": "10.0.21.0/24",
+        "availability_zone": "ap-south-1a",
+        "type": "private_db"
+      },
+      {
+        "subnet_id": "subnet-00a652a5d80acf99f",
+        "name": "expense-tracker-private-db-subnet-2",
+        "cidr_block": "10.0.22.0/24",
+        "availability_zone": "ap-south-1b",
+        "type": "private_db"
+      }
+    ],
+    "nat_gateways": [
+      {
+        "nat_gateway_id": "nat-00b6ef51e976e5998",
+        "name": "expense-tracker-nat-gateway",
+        "state": "available",
+        "subnet_id": "subnet-00c7e3570173ad9ac",
+        "public_ip": "[REDACTED_PUBLIC_IP]",
+        "allocation_id": "eipalloc-032da56bffc50c262",
+        "created_time": "2026-09-29T15:24:44+00:00"
+      }
+    ],
+    "elastic_ips": [
+      {
+        "allocation_id": "eipalloc-032da56bffc50c262",
+        "name": "expense-tracker-nat-eip",
+        "public_ip": "[REDACTED_PUBLIC_IP]",
+        "association_type": "nat_gateway"
+      },
+      {
+        "allocation_id": "eipalloc-0614a80423136e81d",
+        "name": "alb-managed-eip-1",
+        "public_ip": "[REDACTED_PUBLIC_IP]",
+        "association_type": "alb"
+      },
+      {
+        "allocation_id": "eipalloc-0cd9c1792aab159bb",
+        "name": "alb-managed-eip-2",
+        "public_ip": "[REDACTED_PUBLIC_IP]",
+        "association_type": "alb"
+      }
+    ],
+    "load_balancers": [
+      {
+        "name": "expense-alb",
+        "arn": "arn:aws:elasticloadbalancing:ap-south-1:205639******:loadbalancer/app/expense-alb/489f800913f5d0ca",
+        "dns_name": "expense-alb-1555251367.ap-south-1.elb.amazonaws.com",
+        "type": "application",
+        "scheme": "internet-facing",
+        "state": "active",
+        "vpc_id": "vpc-0c0e6084ab7a5ea70",
+        "security_groups": ["sg-062f5922343d0d946"],
+        "target_groups": [
+          {
+            "name": "expense-target-group-backend",
+            "protocol": "HTTP",
+            "port": 8000,
+            "health_check_path": "/api/health"
+          },
+          {
+            "name": "expense-target-group-frontend",
+            "protocol": "HTTP",
+            "port": 80,
+            "health_check_path": "/"
+          }
+        ]
+      }
+    ],
+    "api_gateways": [
+      {
+        "api_id": "d3dpf59d6g",
+        "name": "expense-tracker-api",
+        "protocol": "HTTP",
+        "endpoint": "https://d3dpf59d6g.execute-api.ap-south-1.amazonaws.com"
+      }
+    ],
+    "vpc_endpoints": [
+      {
+        "endpoint_id": "vpce-07109946b5c3f8627",
+        "service_name": "com.amazonaws.ap-south-1.s3",
+        "type": "Gateway",
+        "state": "available",
+        "vpc_id": "vpc-0c0e6084ab7a5ea70"
+      }
+    ],
+    "security_groups": [
+      {
+        "group_id": "sg-0da1e182fb34451f4",
+        "group_name": "public_sg",
+        "description": "Frontend public security group"
+      },
+      {
+        "group_id": "sg-06b195c60984cc4bb",
+        "group_name": "app_sg",
+        "description": "Private backend application security group"
+      },
+      {
+        "group_id": "sg-025d39bbcd6e498ca",
+        "group_name": "db_sg",
+        "description": "Private database security group"
+      },
+      {
+        "group_id": "sg-062f5922343d0d946",
+        "group_name": "alb_sg",
+        "description": "ALB security group (ports 80 and 443)"
+      },
+      {
+        "group_id": "sg-0313b7e368981c66e",
+        "group_name": "expense-lambda-sg",
+        "description": "Lambda function security group"
+      }
+    ]
+  },
+  "database": {
+    "rds_instances": [
+      {
+        "identifier": "expense-tracker-db",
+        "engine": "postgres",
+        "engine_version": "17.9",
+        "instance_class": "db.t3.micro",
+        "status": "available",
+        "storage_gb": 20,
+        "storage_type": "gp3",
+        "encrypted": true,
+        "multi_az": false,
+        "deletion_protection": true,
+        "db_name": "expense_db",
+        "endpoint": "expense-tracker-db.c1ewiss4yrgw.ap-south-1.rds.amazonaws.com:5432",
+        "master_username": "expense_user",
+        "master_user_secret_arn": "arn:aws:secretsmanager:ap-south-1:205639******:secret:rds!db-22302a8e-8762-4ff6-9c36-fc94d952b157-9ZWLKZ"
+      }
+    ],
+    "secrets_manager": [
+      {
+        "name": "rds!db-22302a8e-8762-4ff6-9c36-fc94d952b157",
+        "arn": "arn:aws:secretsmanager:ap-south-1:205639******:secret:rds!db-22302a8e-8762-4ff6-9c36-fc94d952b157-9ZWLKZ",
+        "owning_service": "rds",
+        "rotation_enabled": true,
+        "rotation_interval_days": 7
+      }
+    ]
+  },
+  "storage": {
+    "s3_buckets": [
+      {
+        "name": "expense-tracker-bucket-yd2026",
+        "versioning": "Enabled",
+        "contains_reports": true,
+        "sample_report_count": 49,
+        "role": "Report generation and export storage"
+      },
+      {
+        "name": "expense-tracker-logs-yd2026",
+        "versioning": "Disabled",
+        "contains_logs": true,
+        "role": "S3 access logs target bucket"
+      },
+      {
+        "name": "expense-tracker-ansible-ssm-yd2026",
+        "versioning": "Disabled",
+        "contains_objects": false,
+        "role": "Ansible SSM controller transfer bucket"
+      }
+    ],
+    "ecr_repositories": [
+      {
+        "name": "expense-tracker-frontend",
+        "uri": "205639******.dkr.ecr.ap-south-1.amazonaws.com/expense-tracker-frontend",
+        "image_count": 25
+      },
+      {
+        "name": "expense-tracker-backend",
+        "uri": "205639******.dkr.ecr.ap-south-1.amazonaws.com/expense-tracker-backend",
+        "image_count": 28
+      }
+    ]
+  },
+  "observability": {
+    "cloudwatch_dashboards": [
+      {
+        "name": "expense-tracker-dashboard",
+        "arn": "arn:aws:cloudwatch::205639******:dashboard/expense-tracker-dashboard"
+      }
+    ],
+    "cloudwatch_log_groups": [
+      {
+        "name": "/aws/apigateway/expense-tracker",
+        "retention_days": 14,
+        "stored_bytes": 0
+      },
+      {
+        "name": "/aws/lambda/expense-tracker-lambda",
+        "retention_days": 14,
+        "stored_bytes": 5323
+      }
+    ],
+    "sns_topics": [
+      {
+        "arn": "arn:aws:sns:ap-south-1:205639******:expense-tracker-alerts"
+      }
+    ]
+  },
+  "identity_and_access": {
+    "cognito_user_pools": [
+      {
+        "id": "ap-south-1_uaZaEifVt",
+        "name": "expense-user-pool-yd2026"
+      }
+    ],
+    "iam_roles": [
+      "expense-ec2-ssm-role",
+      "expense-github-actions-ecr-role",
+      "expense_lambda_role"
+    ],
+    "iam_instance_profiles": [
+      "expense-ec2-ssm-profile"
+    ],
+    "oidc_providers": [
+      "token.actions.githubusercontent.com"
+    ]
+  }
+}
